@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عالم الخيال التفاعلي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        body {
+            overflow-x: hidden;
+            background: #000;
+            color: #fff;
+            cursor: none;
+        }
+        
+        .custom-cursor {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+            mix-blend-mode: difference;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease;
+        }
+        
+        .cursor-follower {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+        }
+        
+        section {
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .hero {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 6vw;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .hero p {
+            font-size: 1.5vw;
+            max-width: 60%;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .brush-container {
+            position: fixed;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .brush {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            border: 2px solid #fff;
+        }
+        
+        .brush:hover {
+            transform: scale(1.2);
+        }
+        
+        .section-title {
+            font-size: 4vw;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+        
+        .content-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 800px;
+            width: 90%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        /* Media Queries for Enhanced Responsiveness */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 8vw;
+            }
+            
+            .hero p {
+                font-size: 2vw;
+                max-width: 80%;
+            }
+            
+            .section-title {
+                font-size: 6vw;
+            }
+            
+            .content-box {
+                padding: 2rem;
+            }
+            
+            .brush {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .brush-container {
+                gap: 10px;
+                padding: 10px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 10vw;
+            }
+            
+            .hero p {
+                font-size: 3vw;
+                max-width: 90%;
+            }
+            
+            .section-title {
+                font-size: 8vw;
+            }
+            
+            .content-box {
+                padding: 1.5rem;
+                width: 95%;
+            }
+            
+            .brush {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .brush-container {
+                bottom: 2%;
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            .custom-cursor {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .cursor-follower {
+                width: 40px;
+                height: 40px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 12vw;
+            }
+            
+            .hero p {
+                font-size: 4vw;
+                max-width: 95%;
+            }
+            
+            .section-title {
+                font-size: 10vw;
+            }
+            
+            .content-box {
+                padding: 1rem;
+                width: 98%;
+            }
+            
+            .brush {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .brush-container {
+                bottom: 1%;
+                gap: 5px;
+                padding: 5px;
+                border-radius: 30px;
+            }
+            
+            .custom-cursor {
+                width: 15px;
+                height: 15px;
+            }
+            
+            .cursor-follower {
+                width: 30px;
+                height: 30px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .hero h1 {
+                font-size: 14vw;
+            }
+            
+            .hero p {
+                font-size: 5vw;
+            }
+            
+            .section-title {
+                font-size: 12vw;
+            }
+            
+            .brush {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .brush-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 3px;
+                padding: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-cursor"></div>
+    <div class="cursor-follower"></div>
+    
+    <section class="hero">
+        <h1 id="main-title">عالم الخيال التفاعلي</h1>
+        <p>استكشف عالمًا سحريًا من التأثيرات البصرية ثلاثية الأبعاد والتفاعلات المذهلة</p>
+        <canvas id="hero-canvas"></canvas>
+    </section>
+    
+    <section class="about">
+        <div class="content-box">
+            <h2 class="section-title">حول هذا المشروع</h2>
+            <p>هذه الصفحة تم إنشاؤها باستخدام أحدث تقنيات الويب مثل Three.js وGSAP لخلق تجربة غامرة وممتعة للمستخدم. يمكنك التفاعل مع الصفحة باستخدام فرشة الألوان في الأسفل لرسم تأثيرات بصرية مذهلة.</p>
+        </div>
+        <canvas id="about-canvas"></canvas>
+    </section>
+    
+    <section class="features">
+        <div class="content-box">
+            <h2 class="section-title">الميزات الرئيسية</h2>
+            <ul>
+                <li>تأثيرات ثلاثية الأبعاد باستخدام Three.js</li>
+                <li>رسومات متحركة تفاعلية</li>
+                <li>تأثيرات Parallax أثناء التمرير</li>
+                <li>فرشة ألوان لإنشاء فن تفاعلي</li>
+                <li>تصميم متجاوب يعمل على جميع الأجهزة</li>
+            </ul>
+        </div>
+        <canvas id="features-canvas"></canvas>
+    </section>
+    
+    <section class="contact">
+        <div class="content-box">
+            <h2 class="section-title">تواصل معنا</h2>
+            <p>إذا أعجبتك هذه التجربة وتريد إنشاء شيء مشابه لموقعك، لا تتردد في التواصل معنا.</p>
+        </div>
+        <canvas id="contact-canvas"></canvas>
+    </section>
+    
+    <div class="brush-container">
+        <div class="brush" style="background: #ff0000;" data-color="#ff0000"></div>
+        <div class="brush" style="background: #00ff00;" data-color="#00ff00"></div>
+        <div class="brush" style="background: #0000ff;" data-color="#0000ff"></div>
+        <div class="brush" style="background: #ffff00;" data-color="#ffff00"></div>
+        <div class="brush" style="background: #ff00ff;" data-color="#ff00ff"></div>
+        <div class="brush" style="background: #00ffff;" data-color="#00ffff"></div>
+        <div class="brush" style="background: #ffffff;" data-color="#ffffff"></div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.min.js"></script>
+    
+    <script>
+        // تهيئة المؤشر المخصص
+        const cursor = document.querySelector('.custom-cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+        
+        document.addEventListener('mousedown', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(0.7)';
+            cursorFollower.style.transform = 'translate(-50%, -50%) scale(0.7)';
+        });
+        
+        document.addEventListener('mouseup', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+            cursorFollower.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+        
+        // إخفاء المؤشر المخصص على الأجهزة التي تعمل باللمس
+        if (window.matchMedia("(pointer: coarse)").matches) {
+            cursor.style.display = 'none';
+            cursorFollower.style.display = 'none';
+        }
+        
+        // تهيئة Three.js لكل قسم
+        const sections = document.querySelectorAll('section');
+        const canvases = {};
+        
+        sections.forEach(section => {
+            const canvasId = section.className + '-canvas';
+            canvases[section.className] = {
+                canvas: document.getElementById(canvasId),
+                scene: null,
+                camera: null,
+                renderer: null,
+                objects: []
+            };
+        });
+        
+        // تهيئة Three.js للقسم الرئيسي
+        function initHeroScene() {
+            const hero = canvases['hero'];
+            
+            // إنشاء المشهد
+            hero.scene = new THREE.Scene();
+            
+            // إنشاء الكاميرا
+            hero.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            hero.camera.position.z = window.innerWidth < 480 ? 3 : 5;
+            
+            // إنشاء العارض
+            hero.renderer = new THREE.WebGLRenderer({ 
+                canvas: hero.canvas,
+                alpha: true,
+                antialias: true
+            });
+            hero.renderer.setSize(window.innerWidth, window.innerHeight);
+            hero.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            // إضافة الضوء
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            hero.scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(1, 1, 1);
+            hero.scene.add(directionalLight);
+            
+            // إنشاء نص ثلاثي الأبعاد
+            const loader = new THREE.FontLoader();
+            loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
+                const textSize = window.innerWidth < 480 ? 0.6 : window.innerWidth < 768 ? 0.8 : 1;
+                const textGeometry = new THREE.TextGeometry('تفاعل', {
+                    font: font,
+                    size: textSize,
+                    height: 0.3,
+                    curveSegments: 12,
+                    bevelEnabled: true,
+                    bevelThickness: 0.03,
+                    bevelSize: 0.02,
+                    bevelOffset: 0,
+                    bevelSegments: 5
+                });
+                
+                const textMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x00ffff,
+                    specular: 0xffffff,
+                    shininess: 100,
+                    flatShading: true
+                });
+                
+                const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+                textGeometry.center();
+                hero.scene.add(textMesh);
+                hero.objects.push(textMesh);
+                
+                // إضافة جسيمات
+                const particlesGeometry = new THREE.BufferGeometry();
+                const particlesCount = window.innerWidth < 480 ? 500 : 1000;
+                
+                const posArray = new Float32Array(particlesCount * 3);
+                
+                for(let i = 0; i < particlesCount * 3; i++) {
+                    posArray[i] = (Math.random() - 0.5) * 10;
+                }
+                
+                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                
+                const particlesMaterial = new THREE.PointsMaterial({
+                    size: window.innerWidth < 480 ? 0.01 : 0.02,
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.8,
+                    blending: THREE.AdditiveBlending
+                });
+                
+                const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+                hero.scene.add(particlesMesh);
+                hero.objects.push(particlesMesh);
+                
+                // تحريك الجسيمات
+                function animateParticles() {
+                    const positions = particlesGeometry.attributes.position.array;
+                    
+                    for(let i = 0; i < particlesCount; i++) {
+                        positions[i * 3 + 1] += 0.001;
+                        
+                        if(positions[i * 3 + 1] > 5) {
+                            positions[i * 3 + 1] = -5;
+                        }
+                    }
+                    
+                    particlesGeometry.attributes.position.needsUpdate = true;
+                }
+                
+                // التحريك
+                function animate() {
+                    requestAnimationFrame(animate);
+                    
+                    textMesh.rotation.x += 0.005;
+                    textMesh.rotation.y += 0.01;
+                    
+                    animateParticles();
+                    
+                    hero.renderer.render(hero.scene, hero.camera);
+                }
+                
+                animate();
+            });
+            
+            // إعادة ضبط الحجم عند تغيير حجم النافذة
+            window.addEventListener('resize', () => {
+                hero.camera.aspect = window.innerWidth / window.innerHeight;
+                hero.camera.position.z = window.innerWidth < 480 ? 3 : 5;
+                hero.camera.updateProjectionMatrix();
+                hero.renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+        
+        // تهيئة تأثيرات الفرشاة
+        function initBrushEffects() {
+            const brushContainer = document.querySelector('.brush-container');
+            const brushes = document.querySelectorAll('.brush');
+            let currentColor = '#ff0000';
+            let isDrawing = false;
+            
+            // إنشاء مشهد للرسم
+            const brushScene = new THREE.Scene();
+            const brushCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            brushCamera.position.z = window.innerWidth < 480 ? 3 : 5;
+            
+            const brushRenderer = new THREE.WebGLRenderer({
+                alpha: true,
+                antialias: true
+            });
+            brushRenderer.setSize(window.innerWidth, window.innerHeight);
+            brushRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            brushRenderer.domElement.style.position = 'fixed';
+            brushRenderer.domElement.style.top = '0';
+            brushRenderer.domElement.style.left = '0';
+            brushRenderer.domElement.style.zIndex = '1';
+            brushRenderer.domElement.style.pointerEvents = 'none';
+            document.body.appendChild(brushRenderer.domElement);
+            
+            // اختيار اللون
+            brushes.forEach(brush => {
+                brush.addEventListener('click', () => {
+                    currentColor = brush.getAttribute('data-color');
+                    brushes.forEach(b => b.style.borderColor = '#fff');
+                    brush.style.borderColor = currentColor;
+                });
+                // دعم اللمس
+                brush.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    currentColor = brush.getAttribute('data-color');
+                    brushes.forEach(b => b.style.borderColor = '#fff');
+                    brush.style.borderColor = currentColor;
+                });
+            });
+            
+            // إنشاء جسيمات للرسم
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: window.innerWidth < 480 ? 0.05 : 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            let particlesCount = 0;
+            const maxParticles = window.innerWidth < 480 ? 2500 : 5000;
+            let positions = new Float32Array(maxParticles * 3);
+            let colors = new Float32Array(maxParticles * 3);
+            let sizes = new Float32Array(maxParticles);
+            let velocities = new Float32Array(maxParticles * 3);
+            let lifetimes = new Float32Array(maxParticles);
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            brushScene.add(particlesMesh);
+            
+            // تحويل لون HEX إلى RGB
+            function hexToRgb(hex) {
+                const r = parseInt(hex.substring(1, 3), 16) / 255;
+                const g = parseInt(hex.substring(3, 5), 16) / 255;
+                const b = parseInt(hex.substring(5, 7), 16) / 255;
+                return [r, g, b];
+            }
+            
+            // إضافة جسيم جديد
+            function addParticle(x, y, color) {
+                if (particlesCount >= maxParticles) return;
+                
+                const index = particlesCount * 3;
+                const rgb = hexToRgb(color);
+                
+                // الموضع
+                positions[index] = (x / window.innerWidth) * 2 - 1;
+                positions[index + 1] = -(y / window.innerHeight) * 2 + 1;
+                positions[index + 2] = (Math.random() - 0.5) * 0.1;
+                
+                // اللون
+                colors[index] = rgb[0];
+                colors[index + 1] = rgb[1];
+                colors[index + 2] = rgb[2];
+                
+                // الحجم
+                sizes[particlesCount] = Math.random() * (window.innerWidth < 480 ? 0.1 : 0.2) + 0.1;
+                
+                // السرعة
+                velocities[index] = (Math.random() - 0.5) * 0.02;
+                velocities[index + 1] = (Math.random() - 0.5) * 0.02;
+                velocities[index + 2] = (Math.random() - 0.5) * 0.02;
+                
+                // العمر
+                lifetimes[particlesCount] = Math.random() * 100 + 50;
+                
+                particlesCount++;
+                
+                particlesGeometry.attributes.position.needsUpdate = true;
+                particlesGeometry.attributes.color.needsUpdate = true;
+                particlesGeometry.attributes.size.needsUpdate = true;
+            }
+            
+            // تحديث الجسيمات
+            function updateParticles() {
+                for (let i = 0; i < particlesCount; i++) {
+                    const index = i * 3;
+                    
+                    // تحديث الموضع بالسرعة
+                    positions[index] += velocities[index];
+                    positions[index + 1] += velocities[index + 1];
+                    positions[index + 2] += velocities[index + 2];
+                    
+                    // تقليل العمر
+                    lifetimes[i]--;
+                    
+                    // إذا انتهى العمر، إزالة الجسيم
+                    if (lifetimes[i] <= 0) {
+                        if (i < particlesCount - 1) {
+                            positions[index] = positions[(particlesCount - 1) * 3];
+                            positions[index + 1] = positions[(particlesCount - 1) * 3 + 1];
+                            positions[index + 2] = positions[(particlesCount - 1) * 3 + 2];
+                            
+                            colors[index] = colors[(particlesCount - 1) * 3];
+                            colors[index + 1] = colors[(particlesCount - 1) * 3 + 1];
+                            colors[index + 2] = colors[(particlesCount - 1) * 3 + 2];
+                            
+                            sizes[i] = sizes[particlesCount - 1];
+                            lifetimes[i] = lifetimes[particlesCount - 1];
+                            
+                            velocities[index] = velocities[(particlesCount - 1) * 3];
+                            velocities[index + 1] = velocities[(particlesCount - 1) * 3 + 1];
+                            velocities[index + 2] = velocities[(particlesCount - 1) * 3 + 2];
+                        }
+                        
+                        particlesCount--;
+                        i--;
+                    }
+                }
+                
+                particlesGeometry.attributes.position.needsUpdate = true;
+            }
+            
+            // تفاعلات الماوس
+            document.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                addParticle(e.clientX, e.clientY, currentColor);
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDrawing = false;
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDrawing) {
+                    const particleCount = window.innerWidth < 480 ? 3 : 5;
+                    for (let i = 0; i < particleCount; i++) {
+                        addParticle(
+                            e.clientX + (Math.random() - 0.5) * 20,
+                            e.clientY + (Math.random() - 0.5) * 20,
+                            currentColor
+                        );
+                    }
+                }
+            });
+            
+            // للشاشات التي تعمل باللمس
+            document.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isDrawing = true;
+                addParticle(e.touches[0].clientX, e.touches[0].clientY, currentColor);
+            });
+            
+            document.addEventListener('touchend', () => {
+                isDrawing = false;
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (isDrawing) {
+                    const particleCount = window.innerWidth < 480 ? 3 : 5;
+                    for (let i = 0; i < particleCount; i++) {
+                        addParticle(
+                            e.touches[0].clientX + (Math.random() - 0.5) * 20,
+                            e.touches[0].clientY + (Math.random() - 0.5) * 20,
+                            currentColor
+                        );
+                    }
+                }
+            });
+            
+            // التحريك
+            function animate() {
+                requestAnimationFrame(animate);
+                updateParticles();
+                brushRenderer.render(brushScene, brushCamera);
+            }
+            
+            animate();
+            
+            // إعادة ضبط الحجم عند تغيير حجم النافذة
+            window.addEventListener('resize', () => {
+                brushCamera.aspect = window.innerWidth / window.innerHeight;
+                brushCamera.position.z = window.innerWidth < 480 ? 3 : 5;
+                brushCamera.updateProjectionMatrix();
+                brushRenderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+        
+        // تهيئة تأثيرات التمرير
+        function initScrollEffects() {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // تأثير على العنوان الرئيسي
+            gsap.from("#main-title", {
+                scrollTrigger: {
+                    trigger: ".hero",
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                },
+                y: window.innerWidth < 480 ? 50 : 100,
+                opacity: 0,
+                duration: window.innerWidth < 480 ? 1 : 2
+            });
+            
+            // تأثيرات على الأقسام
+            sections.forEach((section, index) => {
+                if (index > 0) {
+                    gsap.from(section.querySelector('.content-box'), {
+                        scrollTrigger: {
+                            trigger: section,
+                            start: window.innerWidth < 480 ? "top 90%" : "top 80%",
+                            toggleActions: "play none none none"
+                        },
+                        y: window.innerWidth < 480 ? 50 : 100,
+                        opacity: 0,
+                        duration: window.innerWidth < 480 ? 0.8 : 1
+                    });
+                }
+            });
+            
+            // تأثير Parallax للخلفيات
+            sections.forEach(section => {
+                const canvas = section.querySelector('canvas');
+                if (canvas) {
+                    gsap.to(canvas, {
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: true
+                        },
+                        y: window.innerWidth < 480 ? 50 : 100,
+                        ease: "none"
+                    });
+                }
+            });
+        }
+        
+        // تهيئة المشاهد عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            initHeroScene();
+            initBrushEffects();
+            initScrollEffects();
+        });
+    </script>
+</body>
+</html>
